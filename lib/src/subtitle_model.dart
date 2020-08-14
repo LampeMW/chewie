@@ -79,7 +79,7 @@ class Subtitle {
     return Duration(
         hours: int.parse(component[0]),
         minutes: int.parse(component[1]),
-        seconds: int.parse(component[2].split('.')[0]),
-        milliseconds: int.parse(component[2].split('.')[1]));
+        seconds: int.parse(component[2].split(',')[0]),
+        milliseconds: int.parse(component[2].split(',')[1]));
   }
 }
