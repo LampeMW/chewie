@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:open_iconic_flutter/open_iconic_flutter.dart';
 import 'package:video_player/video_player.dart';
+import 'package:auto_orientation/auto_orientation.dart';
 
 class CupertinoControls extends StatefulWidget {
   const CupertinoControls({
@@ -73,17 +74,40 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       onTap: () {
         _cancelAndRestartTimer();
       },
-      child: AbsorbPointer(
-        absorbing: _hideStuff,
-        child: Column(
-          children: <Widget>[
-            _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
-            _buildHitArea(),
-            _buildSubtitles(chewieController.subtitle),
-            _buildBottomBar(backgroundColor, iconColor, barHeight),
-          ],
-        ),
-      ),
+      // child: AbsorbPointer(
+      //   absorbing: _hideStuff,
+      //   child: Column(
+      //     children: <Widget>[
+      //       _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
+      //       _buildHitArea(),
+      //       _buildCenterControls(),
+      //       _buildSubtitles(chewieController.subtitle),
+      //       _buildBottomBar(backgroundColor, iconColor, barHeight),
+      //     ],
+      //   ),
+      // ),
+      child: Stack(
+        children: <Widget> [
+          AbsorbPointer(
+            absorbing: _hideStuff,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
+                _buildHitArea(),
+                _buildSubtitles(chewieController.subtitle),
+                _buildBottomBar(backgroundColor, iconColor, barHeight),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _buildCenterControls()
+            ],
+          )
+        ]
+      )
     );
   }
 
@@ -112,6 +136,47 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     }
 
     super.didChangeDependencies();
+  }
+
+  _buildCenterControls() {
+    return AnimatedOpacity(
+      opacity: _hideStuff ? 0.0 : 1.0,
+      duration: Duration(milliseconds: 300),
+      child: Row(
+        children: <Widget>[
+          GestureDetector(
+            onTap: () {_skipBack();},
+            child: Icon(
+              Icons.replay_10,
+              color: Colors.yellow,
+              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.all(15.0),
+          ),
+          GestureDetector(
+            onTap: () {_playPause();},
+            child: Icon(
+              controller.value.isPlaying ? Icons.pause : (_latestValue.position == _latestValue.duration ? Icons.replay : Icons.play_arrow),
+              color: Colors.yellow,
+              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.all(15.0),
+          ),
+          GestureDetector(
+            onTap: () {_skipForward();},
+            child: Icon(
+              Icons.forward_10,
+              color: Colors.yellow,
+              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+            ),
+          ),
+        ],
+      )
+    );
   }
 
   Widget _buildSubtitles(Subtitles subtitles) {
@@ -506,7 +571,14 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     setState(() {
       _hideStuff = true;
 
-      chewieController.toggleFullScreen();
+      // chewieController.toggleFullScreen();
+      if(chewieController.isFullScreen) {
+        Navigator.of(context).pop();
+        AutoOrientation.portraitUpMode();
+      }else {
+        chewieController.enterFullScreen();
+        AutoOrientation.landscapeRightMode();
+      }
       _expandCollapseTimer = Timer(Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();

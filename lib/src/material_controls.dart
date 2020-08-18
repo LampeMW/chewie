@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
@@ -7,6 +8,7 @@ import 'package:chewie/src/subtitle_model.dart';
 import 'package:chewie/src/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:auto_orientation/auto_orientation.dart';
 
 class MaterialControls extends StatefulWidget {
   const MaterialControls({Key key}) : super(key: key);
@@ -55,11 +57,33 @@ class _MaterialControlsState extends State<MaterialControls> {
 
     return GestureDetector(
       onTap: () => _cancelAndRestartTimer(),
-      child: AbsorbPointer(
-        absorbing: _hideStuff,
-        child: Column(
-          children: <Widget>[
-            _latestValue != null &&
+      // child: AbsorbPointer(
+      //   absorbing: _hideStuff,
+      //   child: Column(
+      //     children: <Widget>[
+      //       _latestValue != null &&
+      //                   !_latestValue.isPlaying &&
+      //                   _latestValue.duration == null ||
+      //               _latestValue.isBuffering
+      //           ? const Expanded(
+      //               child: const Center(
+      //                 child: const CircularProgressIndicator(),
+      //               ),
+      //             )
+      //           : _buildHitArea(),
+      //       _buildSubtitles(context, chewieController.subtitle),
+      //       _buildBottomBar(context),
+      //     ],
+      //   ),
+      // ),
+      child: Stack(
+        children: <Widget> [
+          AbsorbPointer(
+            absorbing: _hideStuff,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _latestValue != null &&
                         !_latestValue.isPlaying &&
                         _latestValue.duration == null ||
                     _latestValue.isBuffering
@@ -69,11 +93,19 @@ class _MaterialControlsState extends State<MaterialControls> {
                     ),
                   )
                 : _buildHitArea(),
-            _buildSubtitles(context, chewieController.subtitle),
-            _buildBottomBar(context),
-          ],
-        ),
-      ),
+                _buildSubtitles(context, chewieController.subtitle),
+                _buildBottomBar(context),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _buildCenterControls()
+            ],
+          )
+        ]
+      )
     );
   }
 
@@ -132,6 +164,61 @@ class _MaterialControlsState extends State<MaterialControls> {
           ],
         ),
       ),
+    );
+  }
+
+  void _skipBack() {
+    _cancelAndRestartTimer();
+    final beginning = Duration(seconds: 0).inMilliseconds;
+    final skip = (_latestValue.position - Duration(seconds: 15)).inMilliseconds;
+    controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
+  }
+
+  void _skipForward() {
+    _cancelAndRestartTimer();
+    final end = _latestValue.duration.inMilliseconds;
+    final skip = (_latestValue.position + Duration(seconds: 15)).inMilliseconds;
+    controller.seekTo(Duration(milliseconds: math.min(skip, end)));
+  }
+
+  _buildCenterControls() {
+    return AnimatedOpacity(
+      opacity: _hideStuff ? 0.0 : 1.0,
+      duration: Duration(milliseconds: 300),
+      child: Row(
+        children: <Widget>[
+          GestureDetector(
+            onTap: () {_skipBack();},
+            child: Icon(
+              Icons.replay_10,
+              color: Colors.yellow,
+              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.all(15.0),
+          ),
+          GestureDetector(
+            onTap: () {_playPause();},
+            child: Icon(
+              controller.value.isPlaying ? Icons.pause : (_latestValue.position == _latestValue.duration ? Icons.replay : Icons.play_arrow),
+              color: Colors.yellow,
+              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.all(15.0),
+          ),
+          GestureDetector(
+            onTap: () {_skipForward();},
+            child: Icon(
+              Icons.forward_10,
+              color: Colors.yellow,
+              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+            ),
+          ),
+        ],
+      )
     );
   }
 
@@ -368,7 +455,14 @@ class _MaterialControlsState extends State<MaterialControls> {
     setState(() {
       _hideStuff = true;
 
-      chewieController.toggleFullScreen();
+      // chewieController.toggleFullScreen();
+      if(chewieController.isFullScreen) {
+        Navigator.of(context).pop();
+        AutoOrientation.portraitUpMode();
+      }else {
+        chewieController.enterFullScreen();
+        AutoOrientation.landscapeRightMode();
+      }
       _showAfterExpandCollapseTimer = Timer(Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();
