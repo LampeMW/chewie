@@ -74,38 +74,29 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       onTap: () {
         _cancelAndRestartTimer();
       },
-      // child: AbsorbPointer(
-      //   absorbing: _hideStuff,
-      //   child: Column(
-      //     children: <Widget>[
-      //       _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
-      //       _buildHitArea(),
-      //       _buildCenterControls(),
-      //       _buildSubtitles(chewieController.subtitle),
-      //       _buildBottomBar(backgroundColor, iconColor, barHeight),
-      //     ],
-      //   ),
-      // ),
       child: Stack(
         children: <Widget> [
           AbsorbPointer(
             absorbing: _hideStuff,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
-                _buildHitArea(),
-                _buildSubtitles(chewieController.subtitle),
-                _buildBottomBar(backgroundColor, iconColor, barHeight),
-              ],
-            ),
+            child: Container(
+              color: _hideStuff ? Colors.transparent : Colors.black45,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
+                  _buildHitArea(),
+                  _buildSubtitles(chewieController.subtitle),
+                  _buildBottomBar(backgroundColor, iconColor, barHeight),
+                ],
+              ),
+            )
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               _buildCenterControls()
             ],
-          )
+          ),
         ]
       )
     );
@@ -145,33 +136,78 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       child: Row(
         children: <Widget>[
           GestureDetector(
-            onTap: () {_skipBack();},
+            onTap: () {
+              if (_hideStuff) {
+                if (_latestValue != null && _latestValue.isPlaying) {
+                  _cancelAndRestartTimer();
+                }
+                else {
+                  _hideTimer?.cancel();
+                  setState(() {
+                    _hideStuff = false;
+                  });
+                }
+              } 
+              else {
+                _skipBack();
+              }
+            },
             child: Icon(
               Icons.replay_10,
-              color: Colors.yellow,
-              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+              color: Colors.white,
+              size: chewieController.isFullScreen ? 72 : 48
             ),
           ),
           Container(
             margin: EdgeInsets.all(15.0),
           ),
           GestureDetector(
-            onTap: () {_playPause();},
+            onTap: () {
+              if (_hideStuff) {
+                if (_latestValue != null && _latestValue.isPlaying) {
+                  _cancelAndRestartTimer();
+                }
+                else {
+                  _hideTimer?.cancel();
+                  setState(() {
+                    _hideStuff = false;
+                  });
+                }
+              }
+              else {
+                _playPause();
+              }
+            },
             child: Icon(
               controller.value.isPlaying ? Icons.pause : (_latestValue.position == _latestValue.duration ? Icons.replay : Icons.play_arrow),
-              color: Colors.yellow,
-              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+              color: Colors.white,
+              size: chewieController.isFullScreen ? 72 : 48
             ),
           ),
           Container(
             margin: EdgeInsets.all(15.0),
           ),
           GestureDetector(
-            onTap: () {_skipForward();},
+            onTap: () {
+              if (_hideStuff) {
+                if (_latestValue != null && _latestValue.isPlaying) {
+                  _cancelAndRestartTimer();
+                }
+                else {
+                  _hideTimer?.cancel();
+                  setState(() {
+                    _hideStuff = false;
+                  });
+                }
+              }
+              else {
+                _skipForward();
+              }
+            },
             child: Icon(
               Icons.forward_10,
-              color: Colors.yellow,
-              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+              color: Colors.white,
+              size: chewieController.isFullScreen ? 72 : 48
             ),
           ),
         ],
@@ -184,6 +220,12 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       return Container();
     }
     if (_subtitlesPosition == null) {
+      return Container();
+    }
+    if (subtitles == null) {
+      setState(() {
+        _subtitleOn = false;
+      });
       return Container();
     }
     final currentSubtitle = subtitles.getByPosition(_subtitlesPosition);
