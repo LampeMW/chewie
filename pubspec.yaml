@@ -12,6 +12,8 @@ environment:
 dependencies:
   open_iconic_flutter: ">=0.3.0 <0.4.0"
   video_player: ">=0.7.0 <0.11.0"
+  auto_orientation:
+    git: https://github.com/devinqw13/auto_orientation
   screen: ">=0.0.4 <0.1.0"
   flutter:
     sdk: flutter
