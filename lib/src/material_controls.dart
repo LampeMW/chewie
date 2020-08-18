@@ -57,45 +57,20 @@ class _MaterialControlsState extends State<MaterialControls> {
 
     return GestureDetector(
       onTap: () => _cancelAndRestartTimer(),
-      // child: AbsorbPointer(
-      //   absorbing: _hideStuff,
-      //   child: Column(
-      //     children: <Widget>[
-      //       _latestValue != null &&
-      //                   !_latestValue.isPlaying &&
-      //                   _latestValue.duration == null ||
-      //               _latestValue.isBuffering
-      //           ? const Expanded(
-      //               child: const Center(
-      //                 child: const CircularProgressIndicator(),
-      //               ),
-      //             )
-      //           : _buildHitArea(),
-      //       _buildSubtitles(context, chewieController.subtitle),
-      //       _buildBottomBar(context),
-      //     ],
-      //   ),
-      // ),
       child: Stack(
         children: <Widget> [
           AbsorbPointer(
             absorbing: _hideStuff,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _latestValue != null &&
-                        !_latestValue.isPlaying &&
-                        _latestValue.duration == null ||
-                    _latestValue.isBuffering
-                ? const Expanded(
-                    child: const Center(
-                      child: const CircularProgressIndicator(),
-                    ),
-                  )
-                : _buildHitArea(),
-                _buildSubtitles(context, chewieController.subtitle),
-                _buildBottomBar(context),
-              ],
+            child: Container(
+              color: _hideStuff ? Colors.transparent : Colors.black45,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _buildHitArea(),
+                  _buildSubtitles(context, chewieController.subtitle),
+                  _buildBottomBar(context),
+                ],
+              ),
             ),
           ),
           Row(
@@ -188,33 +163,78 @@ class _MaterialControlsState extends State<MaterialControls> {
       child: Row(
         children: <Widget>[
           GestureDetector(
-            onTap: () {_skipBack();},
+            onTap: () {
+              if (_hideStuff) {
+                if (_latestValue != null && _latestValue.isPlaying) {
+                  _cancelAndRestartTimer();
+                }
+                else {
+                  _hideTimer?.cancel();
+                  setState(() {
+                    _hideStuff = false;
+                  });
+                }
+              } 
+              else {
+                _skipBack();
+              }
+            },
             child: Icon(
               Icons.replay_10,
-              color: Colors.yellow,
-              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+              color: Colors.white,
+              size: chewieController.isFullScreen ? 72 : 48
             ),
           ),
           Container(
             margin: EdgeInsets.all(15.0),
           ),
           GestureDetector(
-            onTap: () {_playPause();},
+            onTap: () {
+              if (_hideStuff) {
+                if (_latestValue != null && _latestValue.isPlaying) {
+                  _cancelAndRestartTimer();
+                }
+                else {
+                  _hideTimer?.cancel();
+                  setState(() {
+                    _hideStuff = false;
+                  });
+                }
+              }
+              else {
+                _playPause();
+              }
+            },
             child: Icon(
               controller.value.isPlaying ? Icons.pause : (_latestValue.position == _latestValue.duration ? Icons.replay : Icons.play_arrow),
-              color: Colors.yellow,
-              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+              color: Colors.white,
+              size: chewieController.isFullScreen ? 72 : 48
             ),
           ),
           Container(
             margin: EdgeInsets.all(15.0),
           ),
           GestureDetector(
-            onTap: () {_skipForward();},
+            onTap: () {
+              if (_hideStuff) {
+                if (_latestValue != null && _latestValue.isPlaying) {
+                  _cancelAndRestartTimer();
+                }
+                else {
+                  _hideTimer?.cancel();
+                  setState(() {
+                    _hideStuff = false;
+                  });
+                }
+              }
+              else {
+                _skipForward();
+              }
+            },
             child: Icon(
               Icons.forward_10,
-              color: Colors.yellow,
-              size: chewieController.isFullScreen ? MediaQuery.of(context).size.width * .15 : MediaQuery.of(context).size.width * .1
+              color: Colors.white,
+              size: chewieController.isFullScreen ? 72 : 48
             ),
           ),
         ],
@@ -227,6 +247,12 @@ class _MaterialControlsState extends State<MaterialControls> {
       return Container();
     }
     if (_subtitlesPosition == null) {
+      return Container();
+    }
+    if (subtitles == null) {
+      setState(() {
+        _subtitleOn = false;
+      });
       return Container();
     }
     final currentSubtitle = subtitles.getByPosition(_subtitlesPosition);
@@ -289,35 +315,14 @@ class _MaterialControlsState extends State<MaterialControls> {
         onTap: _latestValue != null && _latestValue.isPlaying
             ? _cancelAndRestartTimer
             : () {
-                _playPause();
+                _hideTimer?.cancel();
 
                 setState(() {
-                  _hideStuff = true;
+                  _hideStuff = false;
                 });
               },
         child: Container(
           color: Colors.transparent,
-          child: Center(
-            child: AnimatedOpacity(
-              opacity:
-                  _latestValue != null && !_latestValue.isPlaying && !_dragging
-                      ? 1.0
-                      : 0.0,
-              duration: Duration(milliseconds: 300),
-              child: GestureDetector(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).dialogBackgroundColor,
-                    borderRadius: BorderRadius.circular(48.0),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Icon(Icons.play_arrow, size: 32.0),
-                  ),
-                ),
-              ),
-            ),
-          ),
         ),
       ),
     );
