@@ -28,7 +28,7 @@ class _MaterialControlsState extends State<MaterialControls> {
   Timer _showAfterExpandCollapseTimer;
   bool _dragging = false;
   Duration _subtitlesPosition = Duration();
-  bool _subtitleOn;
+  bool _subtitleOn = false;
 
   final barHeight = 48.0;
   final marginSize = 5.0;

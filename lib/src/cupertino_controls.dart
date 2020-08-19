@@ -37,7 +37,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   Timer _expandCollapseTimer;
   Timer _initTimer;
   Duration _subtitlesPosition;
-  bool _subtitleOn;
+  bool _subtitleOn = false;
 
   VideoPlayerController controller;
   ChewieController chewieController;
