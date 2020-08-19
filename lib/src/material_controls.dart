@@ -132,9 +132,9 @@ class _MaterialControlsState extends State<MaterialControls> {
             chewieController.allowMuting
                 ? _buildMuteButton(controller)
                 : Container(),
-            chewieController.allowFullScreen
-                ? _buildExpandButton()
-                : Container(),
+            // chewieController.allowFullScreen
+            //     ? _buildExpandButton()
+            //     : Container(),
             _buildSubtitleToggle(),
           ],
         ),
@@ -460,14 +460,7 @@ class _MaterialControlsState extends State<MaterialControls> {
     setState(() {
       _hideStuff = true;
 
-      // chewieController.toggleFullScreen();
-      if(chewieController.isFullScreen) {
-        Navigator.of(context).pop();
-        AutoOrientation.portraitUpMode();
-      }else {
-        chewieController.enterFullScreen();
-        AutoOrientation.landscapeRightMode();
-      }
+      chewieController.toggleFullScreen();
       _showAfterExpandCollapseTimer = Timer(Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();
