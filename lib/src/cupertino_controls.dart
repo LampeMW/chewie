@@ -140,7 +140,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
               if (_hideStuff) {
                 if (_latestValue != null && _latestValue.isPlaying) {
                   _cancelAndRestartTimer();
-                }
+                } 
                 else {
                   _hideTimer?.cancel();
                   setState(() {
@@ -166,14 +166,14 @@ class _CupertinoControlsState extends State<CupertinoControls> {
               if (_hideStuff) {
                 if (_latestValue != null && _latestValue.isPlaying) {
                   _cancelAndRestartTimer();
-                }
+                } 
                 else {
                   _hideTimer?.cancel();
                   setState(() {
                     _hideStuff = false;
                   });
                 }
-              }
+              } 
               else {
                 _playPause();
               }
@@ -192,28 +192,28 @@ class _CupertinoControlsState extends State<CupertinoControls> {
               if (_hideStuff) {
                 if (_latestValue != null && _latestValue.isPlaying) {
                   _cancelAndRestartTimer();
-                }
+                } 
                 else {
                   _hideTimer?.cancel();
                   setState(() {
                     _hideStuff = false;
                   });
                 }
-              }
+              } 
               else {
                 _skipForward();
               }
             },
             child: Icon(
               Icons.forward_10,
-              color: Colors.white,
-              size: chewieController.isFullScreen ? 72 : 48
+                color: Colors.white,
+                size: chewieController.isFullScreen ? 72 : 48
+              ),
             ),
-          ),
-        ],
-      )
-    );
-  }
+          ],
+        )
+      );
+    }
 
   Widget _buildSubtitles(Subtitles subtitles) {
     if (!_subtitleOn) {
@@ -568,10 +568,11 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       ),
       child: Row(
         children: <Widget>[
-          chewieController.allowFullScreen
-              ? _buildExpandButton(
-                  backgroundColor, iconColor, barHeight, buttonPadding)
-              : Container(),
+          // chewieController.allowFullScreen
+          //     ? _buildExpandButton(
+          //         backgroundColor, iconColor, barHeight, buttonPadding)
+          //     : Container(),
+          Container(),
           Expanded(child: Container()),
           chewieController.allowMuting
               ? _buildMuteButton(controller, backgroundColor, iconColor,
